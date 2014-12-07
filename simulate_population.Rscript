@@ -1,0 +1,169 @@
+#!/usr/bin/Rscript --vanilla --default-packages=utils
+# simulate_population.Rscript
+# Author: Joseph D. Baugher <jbaughe2(at)jhmi.edu
+# Copyright (c) 2014 Joseph D. Baugher
+
+suppressPackageStartupMessages(library(Biostrings))
+suppressPackageStartupMessages(library("optparse"))
+
+# by default OptionParser will add an help option equivalent to
+# make_option(c("-h", "--help"), action="store_true", default=FALSE,
+# help="Show this help message and exit")
+option_list <- list(
+  make_option("--name", type="character", default="sim_pop", 
+    help="The desired name of the simulated population [default = %default]",
+    metavar="population name"),
+  make_option("--nreads", type="double", default=10000, 
+    help = "The number of reads in the population [default = %default]",
+    metavar="number of reads"),
+  make_option("--width", type="double", default=300, 
+    help = "The width of the simulated alignment [default = %default]",
+    metavar="number of positions"),
+  make_option("--err", type="double", default=0.01, metavar="error rate", 
+    help = "The simulated error rate probability at each position 
+      [default = %default]"),
+  make_option("--haps", type="double", default=2, 
+    help = "The number of unrelated baseline haplotypes [default = %default]",
+    metavar="number of haplotypes"),
+  make_option("--hap_probs", type="character", default="0.5,0.5", 
+    help = "a comma-separated list of the probability of a read belonging to 
+      each haplotype (no spaces) [default = %default]",
+    metavar="proportions of reads in each haplotype"),
+  make_option("--samples", type="double", default=1, 
+    help = "The number of samples [default = %default]",
+    metavar="number of samples created"),
+  make_option(c("-g","--gap"), action="store_true", default=FALSE, 
+    help = "Indicates whether to include gaps as valid symbols in the 
+      simulated sequences [default = %default]", metavar="gaps?"),
+  make_option(c("-n","--n"), action="store_true", default=FALSE, 
+    help = "Indicates whether to include Ns (missing data)as valid symbols 
+      in the simulated sequences [default = %default]", metavar="Ns?")
+)
+
+# get command line options, if help option encountered print help and exit,
+# otherwise if options not found on command line then set defaults,
+opt <- parse_args(OptionParser(option_list=option_list))
+
+haplotype.probs <- as.numeric(unlist(strsplit(opt$hap_probs,",")))
+if(length(haplotype.probs) != opt$haps) {
+    stop("Please enter appropriate read proportions for each haplotype as 
+      detailed in --help.")
+}
+
+############################################
+#
+# FUNCTIONS
+#
+############################################
+
+SimulateHaplotype <- function (read.length, symbols, error.rate) {
+  
+  # Simulates a random haplotype given read length and symbols.
+  # Uses the haplotype to build a probability matrix for each 
+  #   symbol at each position.
+  #
+  # Returns probability matrix
+      
+  # Create haplotype
+  haplo <- rep(0,read.length)
+  haplo <- sapply(haplo,function(x){x=sample(seq(1,length(symbols),1), 1)})
+
+  # Create haplotype probability array with baseline error rate
+  haplo.probs <- array(
+    data=rep(error.rate / (length(symbols) - 1), read.length*length(symbols)),
+    dim=c(read.length,length(symbols))
+  )
+
+  # Incorporate probability for haplotype
+  for (i in 1:read.length) {
+    haplo.probs[i,haplo[i]] = 1 - error.rate
+  }
+  return(haplo.probs)
+}
+
+ChooseValue <- function(x) {
+  # Chooses a value based on underlying probability of occurrence
+  # Expects a vector of probability or frequency values (<= 1)
+  # Returns the value
+  rand.num <- runif(1,0,1)
+
+  sum      <- 0
+  value    <- 'NA'
+  for (i in 1:length(x)) {
+    if (rand.num > sum && rand.num <= sum + x[i]
+        || sum == 0 && rand.num == 0) {
+      value = i
+      break
+    } else {
+      sum = sum + x[i]
+    } 
+  } 
+  return(value)
+}         
+
+SimulateRead <- function(read.length, haplotype.probs, symbol.probs) {
+  # Simulate a read using the probabilities of each haplotype and
+  #   the probabilities of each symbol at each position in the 
+  #   haplotype
+  # The parameter haplotype.probs should be a vector containing the 
+  #   probabilty of a read belonging to each haplotype, in the same 
+  #   order as the arrays of symbol probabilities in symbol.probs
+  #    The parameter symbol.probs should be an array of arrays of
+  #   symbol probabilities for each haplotype
+  #
+  # Returns a single read
+  
+  # Choose a haplotype based on the haplotype probabilities
+  probs = symbol.probs[,,ChooseValue(haplotype.probs)]
+                    
+  # Create a read from the symbol probabilities of the chosen haplotype
+  read = apply(probs, 1, function(x) {ChooseValue(x)})
+  
+  # Convert read from numbers to bases and collapse to a string
+  read = paste(sapply(read, function(x) {symbols[x]}), collapse="")
+  
+  return(read)
+}
+
+############################################
+#
+# MAIN
+#
+############################################
+
+#### Simulate haplotypes and symbol probability matrices
+
+symbols      <- c('A','C','G','T')
+if(opt$gap) { symbols = c(symbols, "-") }
+if(opt$n)   { symbols = c(symbols, "N") }
+
+hap.symbol.probabilities <- array(dim=c(opt$width,length(symbols),opt$haps))
+for (i in 1:opt$haps) {
+  hap.symbol.probabilities[,,i] <- SimulateHaplotype(opt$width, symbols, opt$err)
+}
+
+#### Simulate reads and Create fasta files
+
+reads <- rep('NA', opt$nreads)
+
+# Create new directory if opt$samples > 1, else create a single file
+if(opt$samples > 1){
+  dir.create(file.path(getwd(), opt$name), showWarnings = FALSE)
+}
+
+for (i in 1:opt$samples) {
+  reads <- NULL
+  for (j in 1:opt$nreads) {
+    reads[j] <- SimulateRead(opt$width, haplotype.probs, hap.symbol.probabilities)
+  }
+
+  # Convert reads vector to DNAStringSet object
+  reads <- DNAStringSet(reads)
+  names(reads) = paste("read", seq(1,opt$nreads,1),sep="")
+  
+  if(opt$samples > 1){
+    file.name <- paste(opt$name, "/", opt$name, i,  ".fasta", sep="")
+  }else{ file.name <- paste(opt$name, ".fasta", sep="")}
+  
+  writeXStringSet(reads, file=file.name, format="fasta", width=80,append=F)
+}
