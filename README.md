@@ -3,26 +3,24 @@ BasicSeqPop
 
 ### Creates simulated populations of sequence reads for sampling
 
-These scripts can be used to create populations of sequencing reads (from an
-MSA) from which random samplings of reads can be drawn. The scripts  
-accompany an upcoming peer-reviewed journal article. Additional details will 
-be provided as they become available.
+These scripts can be used to create populations of sequencing reads (from an MSA) from which random samplings of reads can be drawn. The scripts accompany an upcoming peer-reviewed journal article. Additional details will be provided as they become available.
 
 ## Requirements
-This workflow has been tested on MACOSX and linux operating systems
-using recent versions of R.
+This workflow has been tested on MACOSX and linux operating systems using recent versions of R.
 
 #### R libraries:
     Biostrings
     optparse
 
 ## Usage
-simulate_population.Rscript
-	
-Rscript simulate_population.Rscript [options: e.g. --name=Sim_Pop --nreads=10000]
+
+#### simulate_population.Rscript
 
   This script can be used to create a population of reads including multiple haplotypes
   (unrelated) and incorporating an error rate for base calls.
+	
+	Rscript simulate_population.Rscript [options: e.g. --name=Sim_Pop --nreads=10000]
+
 
 	Options:
 	--name        The desired name of the simulated population [default = sim_pop]
@@ -33,19 +31,21 @@ Rscript simulate_population.Rscript [options: e.g. --name=Sim_Pop --nreads=10000
 	--hap_probs   A comma-separated list of the probability of a read belonging to each haplotype (no spaces) 
 	                [default = 0.5,0.5]
 	--samples     The number of samples [default = 1]
-  -g, --gap     Indicates whether to include gaps as valid symbols in the simulated sequences 
-                  [default = FALSE]
+  	-g, --gap     Indicates whether to include gaps as valid symbols in the simulated sequences 
+                  	[default = FALSE]
 	-n, --n       Indicates whether to include Ns (missing data) as valid symbols in the simulated sequences 
 	                [default = FALSE]
 	-h, --help    Show this help message and exit
 	
 	
-	
-    Rscript create_random_samples.Rscript [options: e.g. --name=Sim_Pop --nreads=10000]
+#### create_random_samples.Rscript
 
   This script can be used to create samples consisting of reads randomly drawn from the simulated population. 
+	
+	Rscript create_random_samples.Rscript [options: e.g. --name=Sim_Pop --nreads=10000]
 
-Options:
+
+	Options:
 	--file        The name of the fasta-formatted input file[default = ""]
 	--nreads      The number of reads in each sample [default = 100]
 	--samples     The desired number of randomly drawn samples [default = 100]
