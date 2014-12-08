@@ -3,7 +3,7 @@ BasicSeqPop
 
 ### Creates simulated populations of sequence reads for sampling
 
-These scripts can be used to create populations of sequencing reads (from an MSA) from which random samplings of reads can be drawn. The scripts accompany an upcoming peer-reviewed journal article. Additional details will be provided as they become available.
+These scripts can be used to create populations of sequencing reads from which random samplings of reads can be drawn. The scripts accompany an upcoming peer-reviewed journal article. Additional details will be provided as they become available.
 
 ## Requirements
 This workflow has been tested on MACOSX and linux operating systems using recent versions of R.
@@ -16,7 +16,7 @@ This workflow has been tested on MACOSX and linux operating systems using recent
 
 #### simulate_population.Rscript
 
-  This script can be used to create a population of reads including multiple haplotypes
+  This script can be used to create a population of reads, including multiple haplotypes
   (unrelated) and incorporating an error rate for base calls.
 	
 	Rscript simulate_population.Rscript [options: e.g. --name=Sim_Pop --nreads=10000]
