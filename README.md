@@ -42,7 +42,7 @@ This workflow has been tested on MACOSX and linux operating systems using recent
 
   This script can be used to create samples consisting of reads randomly drawn from the simulated population. 
 	
-	Rscript create_random_samples.Rscript [options: e.g. --name=Sim_Pop --nreads=10000]
+	Rscript create_random_samples.Rscript [options: e.g. --file=Sim_Pop.fasta --nreads=100]
 
 
 	Options:
