@@ -13,10 +13,10 @@ suppressPackageStartupMessages(library("optparse"))
 option_list <- list(
   make_option("--file", type="character", default="", 
     help="The name of the fasta-formatted input file", metavar="file name"),
-  make_option("--depth", type="integer", default=100, 
-    help="Desired read depth of samples", metavar="read depth"),
+  make_option("--nreads", type="integer", default=100, 
+    help="The number of reads in each sample", metavar="read depth"),
   make_option("--samples", type="integer", default=100, 
-    help="The number of samples to create",
+    help="The desired number of samples of randomly drawn reads",
     metavar="number of samples")
 )
 
@@ -30,10 +30,10 @@ filename.base = sub("[.][^.]*$", "", opt$file)
 dir.create(file.path(getwd(), filename.base), showWarnings = FALSE)	
 
 for (i in 1:opt$samples) {
-	rand.sample <- sample(input.reads, opt$depth, replace = TRUE)
+	rand.sample <- sample(input.reads, opt$nreads, replace = TRUE)
 	
 	# ensure unique read names
-	names(rand.sample) = paste("rand_read", seq(1,opt$depth,1),sep="")
+	names(rand.sample) = paste("rand_read", seq(1,opt$nreads,1),sep="")
 	
 	out.filename <- paste(filename.base, "/", filename.base, "_rand_sample", 
 	  i, ".fasta", sep="")
