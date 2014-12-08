@@ -17,13 +17,14 @@ using recent versions of R.
     optparse
 
 ## Usage
-
-    Rscript simulate_population.Rscript [options: e.g. --name=Sim_Pop --nreads=10000]
+simulate_population.Rscript
+	
+Rscript simulate_population.Rscript [options: e.g. --name=Sim_Pop --nreads=10000]
 
   This script can be used to create a population of reads including multiple haplotypes
   (unrelated) and incorporating an error rate for base calls.
 
-Options:
+	Options:
 	--name        The desired name of the simulated population [default = sim_pop]
 	--nreads      The number of reads in the population [default = 10000]
 	--width       The width of the simulated alignment [default = 300]
