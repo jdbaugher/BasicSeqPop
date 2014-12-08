@@ -1,0 +1,41 @@
+#!/usr/bin/Rscript --vanilla --default-packages=utils
+# create_random_samples.Rscript
+# Author: Joseph D. Baugher <jbaughe2(at)jhmi.edu
+# Copyright (c) 2014 Joseph D. Baugher
+
+suppressPackageStartupMessages(library(Biostrings))
+
+suppressPackageStartupMessages(library("optparse"))
+
+# by default OptionParser will add an help option equivalent to
+# make_option(c("-h", "--help"), action="store_true", default=FALSE,
+# help="Show this help message and exit")
+option_list <- list(
+  make_option("--file", type="character", default="", 
+    help="The name of the fasta-formatted input file", metavar="file name"),
+  make_option("--depth", type="integer", default=100, 
+    help="Desired read depth of samples", metavar="read depth"),
+  make_option("--samples", type="integer", default=100, 
+    help="The number of samples to create",
+    metavar="number of samples")
+)
+
+# get command line options, if help option encountered print help and exit,
+# otherwise if options not found on command line then set defaults,
+opt <- parse_args(OptionParser(option_list=option_list))
+
+input.reads <- readDNAStringSet(opt$file, "fasta")
+
+filename.base = sub("[.][^.]*$", "", opt$file)
+dir.create(file.path(getwd(), filename.base), showWarnings = FALSE)	
+
+for (i in 1:opt$samples) {
+	rand.sample <- sample(input.reads, opt$depth, replace = TRUE)
+	
+	# ensure unique read names
+	names(rand.sample) = paste("rand_read", seq(1,opt$depth,1),sep="")
+	
+	out.filename <- paste(filename.base, "/", filename.base, "_rand_sample", 
+	  i, ".fasta", sep="")
+	writeXStringSet(rand.sample, file=out.filename, format="fasta", width=80, append=F)	
+}
