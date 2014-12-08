@@ -48,7 +48,7 @@ This workflow has been tested on MACOSX and linux operating systems using recent
 	Options:
 	--file        The name of the fasta-formatted input file[default = ""]
 	--nreads      The number of reads in each sample [default = 100]
-	--samples     The desired number of randomly drawn samples [default = 100]
+	--samples     The desired number of samples of randomly drawn reads [default = 100]
 
 
 ## Authors
