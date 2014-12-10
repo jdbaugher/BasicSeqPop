@@ -1,7 +1,7 @@
 BasicSeqPop
 ===========
 
-### Creates simulated populations of sequence reads for sampling
+### Creating simulated populations of sequence reads for sampling
 
 These scripts can be used to create populations of sequencing reads from which random samplings of reads can be drawn. The scripts accompany an upcoming peer-reviewed journal article. Additional details will be provided as they become available.
 
