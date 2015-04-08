@@ -58,5 +58,5 @@ Copyright (c) 2014 Joseph D. Baugher, Ph.D.
 
 ## Maintainer
 
-Joseph D. Baugher, Ph.D., jbaughe2(at)jhmi.edu
+Joseph D. Baugher, Ph.D., joebaugher(at)hotmail.com
 
